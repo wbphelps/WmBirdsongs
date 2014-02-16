@@ -4,15 +4,26 @@
 
 import pifacedigitalio
 import pygame
+from time import sleep
 
 pygame.init()
 
 pfd = pifacedigitalio.PiFaceDigital()
 
-print "Ready"
+#print "Ready"
 
 lastinp = 0
 
+i = 0
+while i < 8:
+    pfd.leds[i].turn_on()
+    sleep(0.1)
+    i += 1
+i = 0
+while i < 8:
+    pfd.leds[i].turn_off()
+    sleep(0.1)
+    i += 1
 
 def play(inp):
 
