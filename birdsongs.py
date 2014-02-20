@@ -6,15 +6,21 @@ import pifacedigitalio
 import pygame
 from time import sleep
 
-pygame.init()
+#pygame.init()
+pygame.mixer.init()
 import signal
 import sys
- 
-def signal_term_handler(signal, frame):
-    print 'got SIGTERM'
+
+def signal_handler(signal, frame):
+    print 'SIGNAL {}'.format(signal)
+    sleep(1)
+    pygame.quit()
     sys.exit(0)
  
-signal.signal(signal.SIGTERM, signal_term_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGHUP, signal_handler)
+signal.signal(signal.SIGQUIT, signal_handler)
 
 pfd = pifacedigitalio.PiFaceDigital()
 
@@ -24,6 +30,10 @@ lastinp = 8 # unlikely but safe way to start
 inpd = {0:0, 1:1, 2:2, 4:3, 8:4, 16:5, 32:6, 64:7, 128:8} # to translate pfd input to something sane
 
 pygame.mixer.music.load("quail.mp3")
+
+#vol = pygame.mixer.music.get_volume()
+#print "vol2: {}".format(vol)
+
 pygame.mixer.music.play()
 
 i = 0
@@ -61,7 +71,7 @@ def play(inp):
 #        print "stop"
         pygame.mixer.music.stop()
 
-while 1:
+while True:
 
   try:
     inp = inpd[pfd.input_port.value]
@@ -76,8 +86,10 @@ while 1:
         if (inp>0 and inp<9):
             play(inp)
 
+    sleep(0.1)
+
+  except (KeyboardInterrupt, SystemExit):
+    raise
   except:
     pass
-
-
     
