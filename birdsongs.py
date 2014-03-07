@@ -17,6 +17,7 @@ import pifacedigitalio
 import pygame
 from time import sleep
 import alsaaudio
+import subprocess
 
 #pygame.init()
 pygame.mixer.init()
@@ -37,6 +38,18 @@ signal.signal(signal.SIGQUIT, signal_handler)
 pfd = pifacedigitalio.PiFaceDigital()
 
 #print "Ready"
+
+def setRW():
+    command = "/usr/bin/sudo /bin/mount / -o remount,rw"
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    output = process.communicate()[0]
+    print output
+
+def setRO():
+    command = "/usr/bin/sudo /bin/mount / -o remount,ro"
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    output = process.communicate()[0]
+    print output
 
 lastinp = 8 # unlikely but safe way to start
 inpd = {0:0, 1:1, 2:2, 4:3, 8:4, 16:5, 32:6, 64:7, 128:8} # to translate pfd input to something sane
@@ -66,7 +79,7 @@ def setvol(vol):
     global mixer
     print 'setvol {}'.format(vol)
     mixer.setvolume(vol)
-    print 'getvol {}'.format(mixer.getvolume()[0])
+#    print 'getvol {}'.format(mixer.getvolume()[0])
 
 
 def sing(song):
@@ -108,6 +121,9 @@ def play(inp):
     elif (inp == 4):
         print "stop"
         pygame.mixer.music.stop()
+        setRW()
+        setvol(volume)
+        setRO()
 
     elif (inp >= 5 and inp <= 7):
         sing(inp - 4)
